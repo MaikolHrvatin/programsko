@@ -104,9 +104,20 @@ public class WekaClassifiers {
         return newPath;
     }
     
+    public static void save_ARFF(Instances data, String path) throws IOException{
+        
+        String newPath = path.replace(".arff", "1.arff");
+        // save ARFF
+        ArffSaver saver = new ArffSaver();
+        saver.setInstances(data);//set the dataset we want to convert
+        //and save as ARFF
+        saver.setFile(new File(newPath));
+        saver.writeBatch();
+    }
+    
     public static Instances klasifikatorInit(Instances dataset, int[] n)throws Exception{
         
-        
+        //KOD ZA PRETVARANJE U NIMINALNE VRIJEDNOSTI
         NumericToNominal convert= new NumericToNominal();
 
         convert.setInputFormat(dataset);
@@ -142,6 +153,8 @@ public class WekaClassifiers {
                 break;
             }
             vratiText = vratiText.concat("Correct % = "+eval.pctCorrect()+"\nIncorrect % = "+eval.pctIncorrect()+"\n");
+            //MOGU SE DODATI OVDJE OSTALI PODATCI
+            //vratiText = vratiText.concat(eval.toMatrixString("=== Overall Confusion Matrix ===\n"));
         }
         return vratiText;
     }
@@ -150,8 +163,8 @@ public class WekaClassifiers {
         ThresholdCurve tc = new ThresholdCurve();
         int classIndex = 0;
         Instances result = tc.getCurve(eval.predictions(), classIndex);
-        System.out.println("tPR :"+eval.truePositiveRate(classIndex));
-        System.out.println("fNR :"+eval.falseNegativeRate(classIndex));
+        //System.out.println("tPR :"+eval.truePositiveRate(classIndex));
+        //System.out.println("fNR :"+eval.falseNegativeRate(classIndex));
         
         // plot curve
         ThresholdVisualizePanel vmc = new ThresholdVisualizePanel();
@@ -172,14 +185,14 @@ public class WekaClassifiers {
         // prikaz grafa
         String plotName = vmc.getName(); 
         final javax.swing.JFrame jf = 
-          new javax.swing.JFrame("Weka Classifier Visualize: "+plotName);
+        new javax.swing.JFrame("Weka Classifier Visualize: "+plotName);
         jf.setSize(500,400);
         jf.getContentPane().setLayout(new BorderLayout());
         jf.getContentPane().add(vmc, BorderLayout.CENTER);
         jf.addWindowListener(new java.awt.event.WindowAdapter() {
-          public void windowClosing(java.awt.event.WindowEvent e) {
-          jf.dispose();
-          }
+            public void windowClosing(java.awt.event.WindowEvent e) {
+            jf.dispose();
+            }
         });
         jf.setVisible(true);
     }

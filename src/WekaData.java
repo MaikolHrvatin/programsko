@@ -23,12 +23,12 @@ public class WekaData
     }
 
     private void initializeOptionArray()
-    {
-        
+    {       
         int[] indicesOfColumnsToUse = new int[] {49};
         remove = new Remove();
         remove.setAttributeIndicesArray(indicesOfColumnsToUse);
-        remove.setInvertSelection(true);
+        
+        //remove.setInvertSelection(true);
     }
 
     public void loadFile(String filepath) throws Exception
@@ -44,14 +44,11 @@ public class WekaData
     }
     
     public double getLast(String path, int row) throws Exception
-    {        
-        //testsource = new ConverterUtils.DataSource(path);
-        //testdata = testsource.getDataSet();
-        //System.out.println(testdata.instance(row).value(testdata.numAttributes()-1)+" ");
-        
+    {               
         return(testdata.instance(row).value(testdata.numAttributes()-1));
     }
     
+    //ZA DODAVANJE ATRIBUTA NA KRAJ, KOJI SADRŽI PODATAK IMA LI BUGOVA
     public Instances newData (String path) throws Exception
     {
         testsource = new ConverterUtils.DataSource(path);
@@ -61,7 +58,6 @@ public class WekaData
         Instances newData= new Instances(testdata);
   
         newData.insertAttributeAt(newA, newData.numAttributes());
-        
 
         for(int i=0; i<newData.numInstances(); i++){
             //System.out.println("test" + i);
@@ -75,7 +71,6 @@ public class WekaData
             }
         }
 
-        
         //TEST ZA ISPIS PODATAKA
         /*
         for(int i=0; i<10 ; i++){
@@ -83,6 +78,15 @@ public class WekaData
         }
         System.out.print(newData.instance(0).toString());
         */
+        
+        //OVDJE BI SE TREBAO DODATI FILTER !!!
+        int[] indicesOfColumnsToUse = new int[] {49};
+        remove = new Remove();
+        remove.setAttributeIndicesArray(indicesOfColumnsToUse);
+        remove.setInputFormat(newData);
+        newData = Filter.useFilter(newData, remove);
+        newData.setClassIndex(newData.numAttributes() - 1);
+        //KRAJ FILTRA
         
         return newData;
     }
