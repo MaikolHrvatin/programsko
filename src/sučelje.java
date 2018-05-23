@@ -4,7 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
-
+import org.jfree.ui.RefineryUtilities;
 
 public class sučelje extends javax.swing.JFrame {
 
@@ -14,7 +14,8 @@ public class sučelje extends javax.swing.JFrame {
     }
     public WekaData weka_data = new WekaData();
     public WekaClassifiers weka_c = new WekaClassifiers();
-    public Instances data = null;
+    public Instances data = null, new_data = null;
+    public int[] indices;
  
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -36,6 +37,7 @@ public class sučelje extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         labelDatoteka = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        B_boxplot = new javax.swing.JButton();
 
         jMenuItem1.setText("jMenuItem1");
 
@@ -78,7 +80,7 @@ public class sučelje extends javax.swing.JFrame {
 
         jLabel3.setText("Prikaz podataka");
 
-        jButton1.setText("Prikaz grafa");
+        jButton1.setText("ROC krivulja");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -86,6 +88,13 @@ public class sučelje extends javax.swing.JFrame {
         });
 
         jLabel4.setText("Odabrana datoteka:");
+
+        B_boxplot.setText("BoxPlot");
+        B_boxplot.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                B_boxplotActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -107,7 +116,10 @@ public class sučelje extends javax.swing.JFrame {
                             .addComponent(jButtonPodatci))
                         .addGap(51, 51, 51)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButton1)
+                                .addGap(18, 18, 18)
+                                .addComponent(B_boxplot))
                             .addComponent(jLabel3)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 327, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(31, Short.MAX_VALUE))
@@ -134,7 +146,8 @@ public class sučelje extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonPodatci)
-                    .addComponent(jButton1))
+                    .addComponent(jButton1)
+                    .addComponent(B_boxplot))
                 .addGap(37, 37, 37))
         );
 
@@ -150,15 +163,15 @@ public class sučelje extends javax.swing.JFrame {
             }
             */
             //ODABIR KLASIFIKATORA
-            int[] indices = jListKlasifikatori.getSelectedIndices();
-            Instances newData = weka_c.klasifikatorInit(data, indices);
+            indices = jListKlasifikatori.getSelectedIndices();
+            new_data = weka_c.klasifikatorInit(data, indices);
             for(int i=0; i<indices.length; i++){
                 //jTextArea.append(indices[i]+"\n"); // ispisuje id klasifikatora
                 
             }
             
             //PODJELA PODATAKA
-            String ispis = weka_c.klasifikatorSplit(newData, indices);
+            String ispis = weka_c.klasifikatorSplit(new_data, indices);
             //PRIKAZ PODATAKA
             jTextArea.setText(ispis);
   
@@ -183,7 +196,7 @@ public class sučelje extends javax.swing.JFrame {
         //modelKlasifikator.addElement("REPTree");
         //modelKlasifikator.addElement("OneR");
         //modelKlasifikator.addElement("PART");
-        //modelKlasifikator.addElement("ZeroR");
+        modelKlasifikator.addElement("ZeroR");
         jListKlasifikatori.setModel(modelKlasifikator);
         //KRAJ DEKLARACIJE KLASIFIKATORA
         
@@ -228,6 +241,19 @@ public class sučelje extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void B_boxplotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_boxplotActionPerformed
+        try {
+            final BoxAndWhiskerDemo boxplot;
+            boxplot = new BoxAndWhiskerDemo("Box-and-Whisker Chart Demo", new_data, indices);
+            boxplot.pack();
+            RefineryUtilities.centerFrameOnScreen(boxplot);
+            boxplot.setVisible(true);
+        } catch (Exception ex) {
+            Logger.getLogger(sučelje.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_B_boxplotActionPerformed
+
     public static void main(String args[]) {
         
         try {
@@ -255,6 +281,7 @@ public class sučelje extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton B_boxplot;
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButtonPodatci;

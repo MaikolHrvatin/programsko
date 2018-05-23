@@ -18,18 +18,21 @@ import java.util.Random;
 import weka.classifiers.trees.J48;
 import weka.classifiers.Evaluation;
 import weka.classifiers.evaluation.ThresholdCurve;
+import weka.classifiers.functions.LinearRegression;
+import weka.classifiers.trees.RandomForest;
+import weka.classifiers.trees.RandomTree;
 import weka.core.Utils;
 import weka.gui.visualize.PlotData2D;
 import weka.gui.visualize.ThresholdVisualizePanel;
 
 public class WekaClassifiers {
-    private static Classifier[] clas = new Classifier[2];
     private static Evaluation eval;
-    
+    private static Classifier[] clas = new Classifier[3];
     static{
         clas = new Classifier[]{
             new J48(),
-            new NaiveBayes()
+            new NaiveBayes(),
+            new RandomTree()
         };
     }
     
@@ -104,20 +107,9 @@ public class WekaClassifiers {
         return newPath;
     }
     
-    public static void save_ARFF(Instances data, String path) throws IOException{
-        
-        String newPath = path.replace(".arff", "1.arff");
-        // save ARFF
-        ArffSaver saver = new ArffSaver();
-        saver.setInstances(data);//set the dataset we want to convert
-        //and save as ARFF
-        saver.setFile(new File(newPath));
-        saver.writeBatch();
-    }
-    
     public static Instances klasifikatorInit(Instances dataset, int[] n)throws Exception{
         
-        //KOD ZA PRETVARANJE U NIMINALNE VRIJEDNOSTI
+        //KOD ZA PRETVARANJE U NOMINALNE VRIJEDNOSTI
         NumericToNominal convert= new NumericToNominal();
 
         convert.setInputFormat(dataset);
@@ -127,34 +119,50 @@ public class WekaClassifiers {
         
 	for(int i=0;i<n.length;i++){
             clas[n[i]].buildClassifier(newData);
+            //System.out.println("test"+ clas[n[i]].toString());
         }
-        //System.out.println(tree.getCapabilities().toString());
-        //System.out.println(tree.graph());
-        
-        //System.out.println(nb.getCapabilities().toString ());
        
         return newData;
     }
     
     public static String klasifikatorSplit(Instances newData, int[] n)throws Exception{
         String vratiText = "";
-        Random rand = new Random(1);
-        int folds = 10;          
-        eval = new Evaluation(newData);
-
+        int folds = 10;
+        
         for(int i=0;i<n.length;i++){
-            eval.crossValidateModel(clas[n[i]], newData, folds, rand);
+            eval = new Evaluation(newData);
+            eval.crossValidateModel(clas[n[i]], newData, folds, new Random(1));
+            
             switch(n[i]){
                 case 0:vratiText = vratiText.concat("J48\n");
                 break;
                 case 1:vratiText = vratiText.concat("Bayes\n");
                 break;
-                default:vratiText = vratiText.concat("Greška\n");
+                case 2:vratiText = vratiText.concat("test\n");
                 break;
+                default:vratiText = vratiText.concat("Greška\n");
+                break;               
+           
             }
+            double x = eval.truePositiveRate(n[i]);
+            double y = eval.trueNegativeRate(n[i]);
+            
             vratiText = vratiText.concat("Correct % = "+eval.pctCorrect()+"\nIncorrect % = "+eval.pctIncorrect()+"\n");
+            vratiText = vratiText.concat("AUC = "+eval.areaUnderROC(1)+"\n");
+            vratiText = vratiText.concat("Gm = " + Math.sqrt(x*y) +"\n");
             //MOGU SE DODATI OVDJE OSTALI PODATCI
-            //vratiText = vratiText.concat(eval.toMatrixString("=== Overall Confusion Matrix ===\n"));
+            /*
+            vratiText = vratiText.concat("kappa = "+eval.kappa()+"\n");
+            vratiText = vratiText.concat("MAE = "+eval.meanAbsoluteError()+"\n");
+            vratiText = vratiText.concat("RMSE = "+eval.rootMeanSquaredError()+"\n");
+            vratiText = vratiText.concat("RAE = "+eval.relativeAbsoluteError()+"\n");
+            vratiText = vratiText.concat("RRSE = "+eval.rootRelativeSquaredError()+"\n");
+            vratiText = vratiText.concat("Precision = "+eval.precision(1)+"\n");
+            vratiText = vratiText.concat("Recall = "+eval.recall(1)+"\n");
+            vratiText = vratiText.concat("fMeasure = "+eval.fMeasure(1)+"\n");
+            vratiText = vratiText.concat("Error Rate = "+eval.errorRate()+"\n");
+            vratiText = vratiText.concat(eval.toMatrixString("=== Overall Confusion Matrix ===")+"\n");
+            */
         }
         return vratiText;
     }
@@ -163,8 +171,6 @@ public class WekaClassifiers {
         ThresholdCurve tc = new ThresholdCurve();
         int classIndex = 0;
         Instances result = tc.getCurve(eval.predictions(), classIndex);
-        //System.out.println("tPR :"+eval.truePositiveRate(classIndex));
-        //System.out.println("fNR :"+eval.falseNegativeRate(classIndex));
         
         // plot curve
         ThresholdVisualizePanel vmc = new ThresholdVisualizePanel();
@@ -197,9 +203,42 @@ public class WekaClassifiers {
         jf.setVisible(true);
     }
     
+    public static double[][] box_plot(Instances data, int[] indices) throws Exception{
+        int folds = 10;
+        Random random = new Random(1); 
+        double[][] GM = new double[indices.length][folds];
+        
+        for (int i = 0; i < indices.length; i++) { 
+            for (int j=0; j<folds; j++){
+                eval = new Evaluation(data); 
+                Instances train = data.trainCV(folds, j, random); 
+                eval.setPriors(train); 
+                //Classifier copiedClassifier = Classifier.makeCopy(clas[1]); 
+                //clas[1].buildClassifier(train); 
+                Instances test = data.testCV(folds, j); 
+                eval.evaluateModel(clas[indices[i]], test); 
+                // output fold statistics 
+                //System.out.println("\nFold " + (i+1) + ":\n" + eval.toSummaryString()); 
+                double x = eval.truePositiveRate(indices[i]);
+                double y = eval.trueNegativeRate(indices[i]);
+                GM[i][j] = Math.sqrt(x*y);
+            }
+        } 
+        /*
+        for (int i = 0; i < indices.length; i++) { 
+            for (int j=0; j<folds; j++){
+                System.out.println(i+"."+j+"***"+GM[i][j]+" ");
+            }
+            System.out.println("\n");
+        } 
+        */
+        return GM;
+    }
+    }
+    /*
     public static void main(String[] args) throws Exception {
         //stvaramo novu arff datoteku i dobivamo njen path
-        /*
+        
         String arffPath = changeCSV_to_ARFF("C:\\Users\\Maikol\\Desktop\\PROGRAMSKO DATASETS\\JDT_R2_1.csv");
 
 	DataSource source = new DataSource(arffPath);
@@ -304,7 +343,7 @@ public class WekaClassifiers {
             Logger.getLogger(test.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        */
+        
            
     }
-}
+*/
