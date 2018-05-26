@@ -15,6 +15,7 @@ public class sučelje extends javax.swing.JFrame {
     public WekaData weka_data = new WekaData();
     public WekaClassifiers weka_c = new WekaClassifiers();
     public Instances data = null, new_data = null;
+    public Instances[][] split = null;
     public int[] indices;
  
     @SuppressWarnings("unchecked")
@@ -38,6 +39,7 @@ public class sučelje extends javax.swing.JFrame {
         labelDatoteka = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         B_boxplot = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         jMenuItem1.setText("jMenuItem1");
 
@@ -96,6 +98,13 @@ public class sučelje extends javax.swing.JFrame {
             }
         });
 
+        jButton2.setText("test");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -119,7 +128,9 @@ public class sučelje extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jButton1)
                                 .addGap(18, 18, 18)
-                                .addComponent(B_boxplot))
+                                .addComponent(B_boxplot)
+                                .addGap(18, 18, 18)
+                                .addComponent(jButton2))
                             .addComponent(jLabel3)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 327, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(31, Short.MAX_VALUE))
@@ -147,7 +158,8 @@ public class sučelje extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonPodatci)
                     .addComponent(jButton1)
-                    .addComponent(B_boxplot))
+                    .addComponent(B_boxplot)
+                    .addComponent(jButton2))
                 .addGap(37, 37, 37))
         );
 
@@ -165,10 +177,7 @@ public class sučelje extends javax.swing.JFrame {
             //ODABIR KLASIFIKATORA
             indices = jListKlasifikatori.getSelectedIndices();
             new_data = weka_c.klasifikatorInit(data, indices);
-            for(int i=0; i<indices.length; i++){
-                //jTextArea.append(indices[i]+"\n"); // ispisuje id klasifikatora
-                
-            }
+            //split = weka_c.crossValidationSplit(new_data, 10);
             
             //PODJELA PODATAKA
             String ispis = weka_c.klasifikatorSplit(new_data, indices);
@@ -187,16 +196,16 @@ public class sučelje extends javax.swing.JFrame {
         //DEKLARIRANJE KLASIFIKATORA
         DefaultListModel modelKlasifikator = new DefaultListModel();
         modelKlasifikator.addElement("J48");
-        // OVI NE RADE :p
+        modelKlasifikator.addElement("NaiveBayes");
+        modelKlasifikator.addElement("RandomTree");
         //modelKlasifikator.addElement("LMT");
         //modelKlasifikator.addElement("M5P");
-        modelKlasifikator.addElement("NaiveBayes");
-        //modelKlasifikator.addElement("RandomForest");
-        //modelKlasifikator.addElement("RandomTree");
-        //modelKlasifikator.addElement("REPTree");
-        //modelKlasifikator.addElement("OneR");
-        //modelKlasifikator.addElement("PART");
-        modelKlasifikator.addElement("ZeroR");
+        //
+        modelKlasifikator.addElement("REPTree");
+        modelKlasifikator.addElement("RandomForest");
+        /*modelKlasifikator.addElement("OneR");
+        modelKlasifikator.addElement("PART");
+        modelKlasifikator.addElement("ZeroR");*/
         jListKlasifikatori.setModel(modelKlasifikator);
         //KRAJ DEKLARACIJE KLASIFIKATORA
         
@@ -242,7 +251,10 @@ public class sučelje extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void B_boxplotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_boxplotActionPerformed
+            indices = jListKlasifikatori.getSelectedIndices();
+            
         try {
+            new_data = weka_c.klasifikatorInit(data, indices);
             final BoxAndWhiskerDemo boxplot;
             boxplot = new BoxAndWhiskerDemo("Box-and-Whisker Chart Demo", new_data, indices);
             boxplot.pack();
@@ -253,6 +265,10 @@ public class sučelje extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_B_boxplotActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     public static void main(String args[]) {
         
@@ -284,6 +300,7 @@ public class sučelje extends javax.swing.JFrame {
     private javax.swing.JButton B_boxplot;
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButtonPodatci;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

@@ -19,6 +19,7 @@ import weka.classifiers.trees.J48;
 import weka.classifiers.Evaluation;
 import weka.classifiers.evaluation.ThresholdCurve;
 import weka.classifiers.functions.LinearRegression;
+import weka.classifiers.trees.REPTree;
 import weka.classifiers.trees.RandomForest;
 import weka.classifiers.trees.RandomTree;
 import weka.core.Utils;
@@ -27,12 +28,14 @@ import weka.gui.visualize.ThresholdVisualizePanel;
 
 public class WekaClassifiers {
     private static Evaluation eval;
-    private static Classifier[] clas = new Classifier[3];
+    private static Classifier[] clas = new Classifier[50];
     static{
         clas = new Classifier[]{
             new J48(),
             new NaiveBayes(),
-            new RandomTree()
+            new RandomTree(),
+            new REPTree()
+            //new RandomForest()
         };
     }
     
@@ -111,17 +114,36 @@ public class WekaClassifiers {
         
         //KOD ZA PRETVARANJE U NOMINALNE VRIJEDNOSTI
         NumericToNominal convert= new NumericToNominal();
-
+        
+        String[] options = new String[2];
+        options[0]="-R";
+        options[1]="50"; //MORA BITI BROJ 50, NE 49 !!!
+        convert.setOptions(options);
+        
         convert.setInputFormat(dataset);
         
         Instances newData=Filter.useFilter(dataset, convert);
         newData.setClassIndex(newData.numAttributes()-1);
         
+        /*
 	for(int i=0;i<n.length;i++){
             clas[n[i]].buildClassifier(newData);
-            //System.out.println("test"+ clas[n[i]].toString());
         }
-       
+        */
+        /*
+        //TEST ZA KONVERZIJU U NOMINALNE VRIJEDNOSTI
+        System.out.println("Before");
+        for(int i=0; i<3; i=i+1)
+        {
+            System.out.println("Nominal? "+dataset.attribute(i+47).isNominal());
+        }
+
+        System.out.println("After");
+        for(int i=0; i<3; i=i+1)
+        {
+            System.out.println("Nominal? "+newData.attribute(i+47).isNominal());
+        }
+        */
         return newData;
     }
     
@@ -138,31 +160,23 @@ public class WekaClassifiers {
                 break;
                 case 1:vratiText = vratiText.concat("Bayes\n");
                 break;
-                case 2:vratiText = vratiText.concat("test\n");
+                case 2:vratiText = vratiText.concat("RandomTree\n");
                 break;
+                case 3:vratiText = vratiText.concat("REPTree\n");
+                break;
+                case 4:vratiText = vratiText.concat("RandomForest\n");
+                break;
+                
                 default:vratiText = vratiText.concat("Greška\n");
                 break;               
            
             }
-            double x = eval.truePositiveRate(n[i]);
-            double y = eval.trueNegativeRate(n[i]);
+            double x = eval.truePositiveRate(1);
+            double y = eval.trueNegativeRate(1);
             
             vratiText = vratiText.concat("Correct % = "+eval.pctCorrect()+"\nIncorrect % = "+eval.pctIncorrect()+"\n");
             vratiText = vratiText.concat("AUC = "+eval.areaUnderROC(1)+"\n");
             vratiText = vratiText.concat("Gm = " + Math.sqrt(x*y) +"\n");
-            //MOGU SE DODATI OVDJE OSTALI PODATCI
-            /*
-            vratiText = vratiText.concat("kappa = "+eval.kappa()+"\n");
-            vratiText = vratiText.concat("MAE = "+eval.meanAbsoluteError()+"\n");
-            vratiText = vratiText.concat("RMSE = "+eval.rootMeanSquaredError()+"\n");
-            vratiText = vratiText.concat("RAE = "+eval.relativeAbsoluteError()+"\n");
-            vratiText = vratiText.concat("RRSE = "+eval.rootRelativeSquaredError()+"\n");
-            vratiText = vratiText.concat("Precision = "+eval.precision(1)+"\n");
-            vratiText = vratiText.concat("Recall = "+eval.recall(1)+"\n");
-            vratiText = vratiText.concat("fMeasure = "+eval.fMeasure(1)+"\n");
-            vratiText = vratiText.concat("Error Rate = "+eval.errorRate()+"\n");
-            vratiText = vratiText.concat(eval.toMatrixString("=== Overall Confusion Matrix ===")+"\n");
-            */
         }
         return vratiText;
     }
@@ -219,8 +233,8 @@ public class WekaClassifiers {
                 eval.evaluateModel(clas[indices[i]], test); 
                 // output fold statistics 
                 //System.out.println("\nFold " + (i+1) + ":\n" + eval.toSummaryString()); 
-                double x = eval.truePositiveRate(indices[i]);
-                double y = eval.trueNegativeRate(indices[i]);
+                double x = eval.truePositiveRate(1);
+                double y = eval.trueNegativeRate(1);
                 GM[i][j] = Math.sqrt(x*y);
             }
         } 
@@ -234,116 +248,4 @@ public class WekaClassifiers {
         */
         return GM;
     }
-    }
-    /*
-    public static void main(String[] args) throws Exception {
-        //stvaramo novu arff datoteku i dobivamo njen path
-        
-        String arffPath = changeCSV_to_ARFF("C:\\Users\\Maikol\\Desktop\\PROGRAMSKO DATASETS\\JDT_R2_1.csv");
-
-	DataSource source = new DataSource(arffPath);
-	Instances dataset = source.getDataSet();
-	//set class index to the last attribute
-	dataset.setClassIndex(dataset.numAttributes()-1);
-		
-        //INSTANCIRA KLASIFIKATORE
-        Instances newData = klasifikatorInit(dataset, 0);
-        
-	Evaluation eval = new Evaluation(newData);
-	Random rand = new Random(1);
-	int folds = 10;
-		
-		//Notice we build the classifier with the training dataset
-        //we initialize evaluation with the training dataset and then
-        //evaluate using the test dataset
-
-	DataSource source1 = new DataSource("C:\\Users\\Maikol\\Desktop\\PROGRAMSKO DATASETS\\JDT_R2_1.arff");
-	Instances testDataset = source1.getDataSet();
-	testDataset.setClassIndex(testDataset.numAttributes()-1);
-        /*
-        convert.setInputFormat(testDataset);
-        Instances newData1=Filter.useFilter(testDataset, convert);
-	
-	
-	eval.crossValidateModel(tree, newData1, folds, rand);
-	System.out.println(eval.toSummaryString("Evaluation results:\n", false));
-		
-		System.out.println("Correct % = "+eval.pctCorrect());
-		System.out.println("Incorrect % = "+eval.pctIncorrect());
-		System.out.println("AUC = "+eval.areaUnderROC(1)); //površina ispod ROC krivulje
-		System.out.println("kappa = "+eval.kappa());
-		System.out.println("MAE = "+eval.meanAbsoluteError());
-		System.out.println("RMSE = "+eval.rootMeanSquaredError());
-		System.out.println("RAE = "+eval.relativeAbsoluteError());
-		System.out.println("RRSE = "+eval.rootRelativeSquaredError());
-		System.out.println("Precision = "+eval.precision(1));
-		System.out.println("Recall = "+eval.recall(1));
-		System.out.println("fMeasure = "+eval.fMeasure(1));
-		System.out.println("Error Rate = "+eval.errorRate());
-		System.out.println(eval.toMatrixString("=== Overall Confusion Matrix ===\n"));
-        */    
-
-    
-        
-        
-        // I've commented the code as best I can, at the moment.
-        // Comments are denoted by "//" at the beginning of the line.
-        /*
-        BufferedReader datafile = readDataFile("iris.arff"); //učitava podatke
-        
-        Instances data = new Instances(datafile); //sprema podatke u data
-        data.setClassIndex(data.numAttributes() - 1); //postavlja klasu koju predviđamo (inače zadnja)
-        
-        // Choose a type of validation split
-        Instances[][] split = crossValidationSplit(data, 10); //dijeli data u 10 skupina
-        
-        // Separate split into training and testing arrays
-        Instances[] trainingSplits = split[0]; //data za treniranje
-        Instances[] testingSplits  = split[1]; //data za testiranje
-        
-        // Choose a set of classifiers
-        Classifier[] models = {     new J48(),
-                                    new PART(),
-                                    new DecisionTable(),
-                                    new OneR(),
-                                    new LMT(),
-                                    new DecisionStump() 
-        };
-        
-        
-        // Run for each classifier model
-        for(int j = 0; j < models.length; j++) {
-
-            // Collect every group of predictions for current model in a FastVector
-            FastVector predictions = new FastVector();
-            
-            // For each training-testing split pair, train and test the classifier
-            for(int i = 0; i < trainingSplits.length; i++) {
-                Evaluation validation = simpleClassify(models[j], trainingSplits[i], testingSplits[i]);
-                predictions.appendElements(validation.predictions());
-                
-                // Uncomment to see the summary for each training-testing pair.
-                //System.out.println(models[j].toString()); //rad klasifikatora >> j48 stvara stabla
-            }
-            
-            // Calculate overall accuracy of current classifier on all splits
-            double accuracy = calculateAccuracy(predictions);
-            
-            // Print current classifier's name and accuracy in a complicated, but nice-looking way.
-            System.out.println(models[j].getClass().getSimpleName() + ": " + String.format("%.2f%%", accuracy) + "\n=====================");
-        }
-     */
-        //proba nesto = new proba();
-      /*  try {
-            nesto.loadFile("C:\\Users\\Maikol\\Desktop\\PROGRAMSKO DATASETS\\JDT_R2_0.csv");
-            if(nesto.getData() != null){
-               System.out.println("File loaded");
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(test.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
-           
-    }
-*/
+}
