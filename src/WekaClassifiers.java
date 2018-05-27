@@ -51,6 +51,7 @@ public class WekaClassifiers {
         return inputReader;
     }
     
+    // metoda za build, treniranje i testiranje klasifikatora
     public static Evaluation simpleClassify(Classifier model, Instances trainingSet, Instances testingSet) throws Exception {
         Evaluation validation = new Evaluation(trainingSet);
         
@@ -147,15 +148,15 @@ public class WekaClassifiers {
         return newData;
     }
     
-    public static String klasifikatorSplit(Instances newData, int[] n)throws Exception{
+    public static String klasifikatorSplit(Instances[][] splitData, int[] indices)throws Exception{
         String vratiText = "";
         int folds = 10;
         
-        for(int i=0;i<n.length;i++){
-            eval = new Evaluation(newData);
-            eval.crossValidateModel(clas[n[i]], newData, folds, new Random(1));
+        for(int i=0;i<indices.length;i++){
+            //eval = new Evaluation(newData);
+            //eval.crossValidateModel(clas[n[i]], newData, folds, new Random(1));
             
-            switch(n[i]){
+            switch(indices[i]){
                 case 0:vratiText = vratiText.concat("J48\n");
                 break;
                 case 1:vratiText = vratiText.concat("Bayes\n");
@@ -168,9 +169,13 @@ public class WekaClassifiers {
                 break;
                 
                 default:vratiText = vratiText.concat("Greška\n");
-                break;               
-           
+                break;
             }
+            for(int k=0; k<10; k++){
+                //promjeniti kod da pamti podatke !!!
+                eval = simpleClassify(clas[indices[i]], splitData[0][k], splitData[1][k]);
+            }
+            
             double x = eval.truePositiveRate(1);
             double y = eval.trueNegativeRate(1);
             
@@ -181,6 +186,7 @@ public class WekaClassifiers {
         return vratiText;
     }
     
+    //POTREBNO IZMIJENITI GRAF DA UZIMA PODATKE NAKON 10 ITERACIJA
     public static void ROC_graph () throws Exception{
         ThresholdCurve tc = new ThresholdCurve();
         int classIndex = 0;
@@ -217,35 +223,20 @@ public class WekaClassifiers {
         jf.setVisible(true);
     }
     
-    public static double[][] box_plot(Instances data, int[] indices) throws Exception{
+    public static double[][] box_plot(Instances[][] splitData, int[] indices) throws Exception{
         int folds = 10;
-        Random random = new Random(1); 
         double[][] GM = new double[indices.length][folds];
         
         for (int i = 0; i < indices.length; i++) { 
-            for (int j=0; j<folds; j++){
-                eval = new Evaluation(data); 
-                Instances train = data.trainCV(folds, j, random); 
-                eval.setPriors(train); 
-                //Classifier copiedClassifier = Classifier.makeCopy(clas[1]); 
-                //clas[1].buildClassifier(train); 
-                Instances test = data.testCV(folds, j); 
-                eval.evaluateModel(clas[indices[i]], test); 
-                // output fold statistics 
-                //System.out.println("\nFold " + (i+1) + ":\n" + eval.toSummaryString()); 
+            for (int k=0; k<folds; k++){
+                eval = simpleClassify(clas[indices[i]], splitData[0][k], splitData[1][k]);
+
                 double x = eval.truePositiveRate(1);
                 double y = eval.trueNegativeRate(1);
-                GM[i][j] = Math.sqrt(x*y);
+                GM[i][k] = Math.sqrt(x*y);
             }
         } 
-        /*
-        for (int i = 0; i < indices.length; i++) { 
-            for (int j=0; j<folds; j++){
-                System.out.println(i+"."+j+"***"+GM[i][j]+" ");
-            }
-            System.out.println("\n");
-        } 
-        */
+
         return GM;
     }
 }

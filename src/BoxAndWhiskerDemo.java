@@ -18,6 +18,7 @@ import org.jfree.util.LogContext;
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.trees.J48;
+import weka.classifiers.trees.REPTree;
 import weka.classifiers.trees.RandomForest;
 import weka.classifiers.trees.RandomTree;
 import weka.core.Instances;
@@ -37,7 +38,9 @@ public class BoxAndWhiskerDemo extends ApplicationFrame {
         clas = new Classifier[]{
             new J48(),
             new NaiveBayes(),
-            new RandomTree()
+            new RandomTree(),
+            new REPTree()
+            //new RandomForest()
         };
     }
 
@@ -46,11 +49,11 @@ public class BoxAndWhiskerDemo extends ApplicationFrame {
      *
      * @param title  the frame title.
      */
-    public BoxAndWhiskerDemo(final String title, Instances data, int[] indices) throws Exception {
+    public BoxAndWhiskerDemo(final String title, Instances[][] splitData, int[] indices) throws Exception {
 
         super(title);
         
-        final BoxAndWhiskerCategoryDataset dataset = createSampleDataset(data, indices);
+        final BoxAndWhiskerCategoryDataset dataset = createSampleDataset(splitData, indices);
 
         final CategoryAxis xAxis = new CategoryAxis("Klasifikator");
         final NumberAxis yAxis = new NumberAxis("Value");
@@ -77,7 +80,7 @@ public class BoxAndWhiskerDemo extends ApplicationFrame {
      * 
      * @return A sample dataset.
      */
-    private BoxAndWhiskerCategoryDataset createSampleDataset(Instances data, int[] indices) throws Exception {
+    private BoxAndWhiskerCategoryDataset createSampleDataset(Instances[][] splitData, int[] indices) throws Exception {
         
         final int seriesCount = 1; //BROJ BOXPLOTA PO CATEGORIJI/KLASIFIKATORU
         final int categoryCount = indices.length; //BROJ KLASIFIKATORA
@@ -85,7 +88,7 @@ public class BoxAndWhiskerDemo extends ApplicationFrame {
         
         final DefaultBoxAndWhiskerCategoryDataset dataset = new DefaultBoxAndWhiskerCategoryDataset();
         
-        double[][] GM = weka_c.box_plot(data, indices);
+        double[][] GM = weka_c.box_plot(splitData, indices);
         
         for (int i = 0; i < seriesCount; i++) {
             for (int j = 0; j < categoryCount; j++) {
@@ -97,7 +100,7 @@ public class BoxAndWhiskerDemo extends ApplicationFrame {
                 }
                 LOGGER.debug("Adding series " + i);
                 LOGGER.debug(list.toString());
-                dataset.add(list, "Series " + i, clas[indices[j]].toString());
+                dataset.add(list, "Box plot ", clas[indices[j]].toString());
             }
             
         }

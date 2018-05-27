@@ -177,10 +177,10 @@ public class sučelje extends javax.swing.JFrame {
             //ODABIR KLASIFIKATORA
             indices = jListKlasifikatori.getSelectedIndices();
             new_data = weka_c.klasifikatorInit(data, indices);
-            //split = weka_c.crossValidationSplit(new_data, 10);
+            split = weka_c.crossValidationSplit(new_data, 10);
             
             //PODJELA PODATAKA
-            String ispis = weka_c.klasifikatorSplit(new_data, indices);
+            String ispis = weka_c.klasifikatorSplit(split, indices);
             //PRIKAZ PODATAKA
             jTextArea.setText(ispis);
   
@@ -251,12 +251,14 @@ public class sučelje extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void B_boxplotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_boxplotActionPerformed
-            indices = jListKlasifikatori.getSelectedIndices();
-            
+           
         try {
+            indices = jListKlasifikatori.getSelectedIndices();
             new_data = weka_c.klasifikatorInit(data, indices);
+            split = weka_c.crossValidationSplit(new_data, 10);
+            
             final BoxAndWhiskerDemo boxplot;
-            boxplot = new BoxAndWhiskerDemo("Box-and-Whisker Chart Demo", new_data, indices);
+            boxplot = new BoxAndWhiskerDemo("Box-and-Whisker Chart Demo", split, indices);
             boxplot.pack();
             RefineryUtilities.centerFrameOnScreen(boxplot);
             boxplot.setVisible(true);
