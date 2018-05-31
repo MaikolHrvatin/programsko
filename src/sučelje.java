@@ -39,7 +39,7 @@ public class sučelje extends javax.swing.JFrame {
         labelDatoteka = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         B_boxplot = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        b_friedman = new javax.swing.JButton();
 
         jMenuItem1.setText("jMenuItem1");
 
@@ -98,10 +98,10 @@ public class sučelje extends javax.swing.JFrame {
             }
         });
 
-        jButton2.setText("test");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        b_friedman.setText("Friedman");
+        b_friedman.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                b_friedmanActionPerformed(evt);
             }
         });
 
@@ -130,7 +130,7 @@ public class sučelje extends javax.swing.JFrame {
                                 .addGap(18, 18, 18)
                                 .addComponent(B_boxplot)
                                 .addGap(18, 18, 18)
-                                .addComponent(jButton2))
+                                .addComponent(b_friedman))
                             .addComponent(jLabel3)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 327, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(31, Short.MAX_VALUE))
@@ -159,7 +159,7 @@ public class sučelje extends javax.swing.JFrame {
                     .addComponent(jButtonPodatci)
                     .addComponent(jButton1)
                     .addComponent(B_boxplot)
-                    .addComponent(jButton2))
+                    .addComponent(b_friedman))
                 .addGap(37, 37, 37))
         );
 
@@ -175,9 +175,7 @@ public class sučelje extends javax.swing.JFrame {
             }
             */
             //ODABIR KLASIFIKATORA
-            indices = jListKlasifikatori.getSelectedIndices();
-            new_data = weka_c.klasifikatorInit(data, indices);
-            split = weka_c.crossValidationSplit(new_data, 10);
+            indices = jListKlasifikatori.getSelectedIndices();          
             
             //PODJELA PODATAKA
             String ispis = weka_c.klasifikatorSplit(split, indices);
@@ -225,6 +223,10 @@ public class sučelje extends javax.swing.JFrame {
                 //DODAJEMO ZADNJI ATRIBUT IMA LI BUG-OVA
                 data = weka_data.newData(arffPath);
                 
+                //PODJELA DATA U 10 DIJELOVA
+                new_data = weka_c.klasifikatorInit(data);
+                split = weka_c.crossValidationSplit(new_data, 10);
+                
             } catch (Exception ex) {
                 Logger.getLogger(sučelje.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -254,23 +256,34 @@ public class sučelje extends javax.swing.JFrame {
            
         try {
             indices = jListKlasifikatori.getSelectedIndices();
-            new_data = weka_c.klasifikatorInit(data, indices);
-            split = weka_c.crossValidationSplit(new_data, 10);
             
             final BoxAndWhiskerDemo boxplot;
-            boxplot = new BoxAndWhiskerDemo("Box-and-Whisker Chart Demo", split, indices);
+            boxplot = new BoxAndWhiskerDemo("Box-and-Whisker Chart", split, indices);
             boxplot.pack();
             RefineryUtilities.centerFrameOnScreen(boxplot);
             boxplot.setVisible(true);
+            
         } catch (Exception ex) {
             Logger.getLogger(sučelje.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }//GEN-LAST:event_B_boxplotActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void b_friedmanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_friedmanActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+        try {
+            indices = jListKlasifikatori.getSelectedIndices();
+            
+            final TestClassification friedman = new TestClassification();
+            String ispis = friedman.strFriedman(weka_c.box_plot(split, indices));
+            
+            jTextArea.setText(ispis);
+            
+        } catch (Exception ex) {
+            Logger.getLogger(sučelje.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }//GEN-LAST:event_b_friedmanActionPerformed
 
     public static void main(String args[]) {
         
@@ -300,9 +313,9 @@ public class sučelje extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton B_boxplot;
+    private javax.swing.JButton b_friedman;
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButtonPodatci;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

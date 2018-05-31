@@ -68,7 +68,7 @@
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="B_boxplot" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Component id="jButton2" min="-2" max="-2" attributes="0"/>
+                              <Component id="b_friedman" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                           <Component id="jScrollPane1" min="-2" pref="327" max="-2" attributes="0"/>
@@ -106,7 +106,7 @@
                   <Component id="jButtonPodatci" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="B_boxplot" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jButton2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="b_friedman" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
           </Group>
@@ -202,12 +202,12 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="B_boxplotActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="jButton2">
+    <Component class="javax.swing.JButton" name="b_friedman">
       <Properties>
-        <Property name="text" type="java.lang.String" value="test"/>
+        <Property name="text" type="java.lang.String" value="Friedman"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton2ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="b_friedmanActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

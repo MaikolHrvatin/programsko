@@ -28,14 +28,15 @@ import weka.gui.visualize.ThresholdVisualizePanel;
 
 public class WekaClassifiers {
     private static Evaluation eval;
+    private static final int folds = 10;
     private static Classifier[] clas = new Classifier[50];
     static{
         clas = new Classifier[]{
             new J48(),
             new NaiveBayes(),
             new RandomTree(),
-            new REPTree()
-            //new RandomForest()
+            new REPTree(), //ne radi !!!
+            new RandomForest()
         };
     }
     
@@ -82,7 +83,7 @@ public class WekaClassifiers {
             split[0][i] = data.trainCV(numberOfFolds, i);
             split[1][i] = data.testCV(numberOfFolds, i);
         }
-        
+
         return split;
     }
     
@@ -111,7 +112,7 @@ public class WekaClassifiers {
         return newPath;
     }
     
-    public static Instances klasifikatorInit(Instances dataset, int[] n)throws Exception{
+    public static Instances klasifikatorInit(Instances dataset)throws Exception{
         
         //KOD ZA PRETVARANJE U NOMINALNE VRIJEDNOSTI
         NumericToNominal convert= new NumericToNominal();
@@ -126,11 +127,6 @@ public class WekaClassifiers {
         Instances newData=Filter.useFilter(dataset, convert);
         newData.setClassIndex(newData.numAttributes()-1);
         
-        /*
-	for(int i=0;i<n.length;i++){
-            clas[n[i]].buildClassifier(newData);
-        }
-        */
         /*
         //TEST ZA KONVERZIJU U NOMINALNE VRIJEDNOSTI
         System.out.println("Before");
@@ -150,11 +146,8 @@ public class WekaClassifiers {
     
     public static String klasifikatorSplit(Instances[][] splitData, int[] indices)throws Exception{
         String vratiText = "";
-        int folds = 10;
         
         for(int i=0;i<indices.length;i++){
-            //eval = new Evaluation(newData);
-            //eval.crossValidateModel(clas[n[i]], newData, folds, new Random(1));
             
             switch(indices[i]){
                 case 0:vratiText = vratiText.concat("J48\n");
@@ -167,26 +160,39 @@ public class WekaClassifiers {
                 break;
                 case 4:vratiText = vratiText.concat("RandomForest\n");
                 break;
+                //LOGISTIČKA REGRESIJA
                 
                 default:vratiText = vratiText.concat("Greška\n");
                 break;
             }
+            
+            float correct = 0;
+            float incorrect = 0;
+            double roc = 0;
+            double gm = 0;
+            
             for(int k=0; k<10; k++){
                 //promjeniti kod da pamti podatke !!!
                 eval = simpleClassify(clas[indices[i]], splitData[0][k], splitData[1][k]);
+                
+                correct += eval.pctCorrect();
+                incorrect += eval.pctIncorrect();
+                roc += eval.areaUnderROC(1);
+                
+                double x = eval.truePositiveRate(1);
+                double y = eval.trueNegativeRate(1);
+                gm += Math.sqrt(x*y);
+                
+                //System.out.println(gm); //MOŽE BACAT GREŠKU ?
             }
             
-            double x = eval.truePositiveRate(1);
-            double y = eval.trueNegativeRate(1);
-            
-            vratiText = vratiText.concat("Correct % = "+eval.pctCorrect()+"\nIncorrect % = "+eval.pctIncorrect()+"\n");
-            vratiText = vratiText.concat("AUC = "+eval.areaUnderROC(1)+"\n");
-            vratiText = vratiText.concat("Gm = " + Math.sqrt(x*y) +"\n");
+            vratiText = vratiText.concat("Correct % = "+ (correct/folds) +"\nIncorrect % = "+ (incorrect/folds) +"\n");
+            vratiText = vratiText.concat("AUC = "+ (roc/folds) +"\n");
+            vratiText = vratiText.concat("Gm = " + (gm/folds) +"\n\n");
         }
         return vratiText;
     }
     
-    //POTREBNO IZMIJENITI GRAF DA UZIMA PODATKE NAKON 10 ITERACIJA
     public static void ROC_graph () throws Exception{
         ThresholdCurve tc = new ThresholdCurve();
         int classIndex = 0;
@@ -224,7 +230,6 @@ public class WekaClassifiers {
     }
     
     public static double[][] box_plot(Instances[][] splitData, int[] indices) throws Exception{
-        int folds = 10;
         double[][] GM = new double[indices.length][folds];
         
         for (int i = 0; i < indices.length; i++) { 

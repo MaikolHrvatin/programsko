@@ -12,15 +12,8 @@ import org.jfree.chart.renderer.category.BoxAndWhiskerRenderer;
 import org.jfree.data.statistics.BoxAndWhiskerCategoryDataset;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.jfree.ui.ApplicationFrame;
-import org.jfree.ui.RefineryUtilities;
 import org.jfree.util.Log;
 import org.jfree.util.LogContext;
-import weka.classifiers.Classifier;
-import weka.classifiers.bayes.NaiveBayes;
-import weka.classifiers.trees.J48;
-import weka.classifiers.trees.REPTree;
-import weka.classifiers.trees.RandomForest;
-import weka.classifiers.trees.RandomTree;
 import weka.core.Instances;
 
 /**
@@ -33,14 +26,14 @@ public class BoxAndWhiskerDemo extends ApplicationFrame {
     /** Access to logging facilities. */
     private static final LogContext LOGGER = Log.createContext(BoxAndWhiskerDemo.class);
     public WekaClassifiers weka_c = new WekaClassifiers();
-    private static Classifier[] clas = new Classifier[2];
+    private static String[] clas = new String[50];
     static{
-        clas = new Classifier[]{
-            new J48(),
-            new NaiveBayes(),
-            new RandomTree(),
-            new REPTree()
-            //new RandomForest()
+        clas = new String[]{
+            "J48",
+            "NaiveBayes",
+            "RandomTree",
+            "REPTree",
+            "RandomForest"
         };
     }
 
@@ -61,10 +54,11 @@ public class BoxAndWhiskerDemo extends ApplicationFrame {
         final BoxAndWhiskerRenderer renderer = new BoxAndWhiskerRenderer();
         renderer.setFillBox(false);
         renderer.setToolTipGenerator(new BoxAndWhiskerToolTipGenerator());
+        renderer.setMeanVisible(false); //SAKRIVA MEAN TOČKU
         final CategoryPlot plot = new CategoryPlot(dataset, xAxis, yAxis, renderer);
 
         final JFreeChart chart = new JFreeChart(
-            "Box-and-Whisker Demo",
+            "Box-and-Whiskers",
             new Font("SansSerif", Font.BOLD, 14),
             plot,
             true
