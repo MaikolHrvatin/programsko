@@ -1,4 +1,5 @@
 import java.awt.Font;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,11 +33,19 @@ public class BoxAndWhiskerDemo extends ApplicationFrame {
             "J48",
             "NaiveBayes",
             "RandomTree",
-            "REPTree",
-            "RandomForest"
+            "RandomForest",
+            "PART",
+            "Logistic"
         };
     }
 
+    //metoda koja spriječava zatvaranje čitavog programa zatvaranjem box plota
+    public void windowClosing(final WindowEvent evt){
+        if(evt.getWindow() == this){
+            dispose();
+        }
+    }
+    
     /**
      * Creates a new demo.
      *
@@ -64,7 +73,7 @@ public class BoxAndWhiskerDemo extends ApplicationFrame {
             true
         );
         final ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new java.awt.Dimension(450, 270));
+        chartPanel.setPreferredSize(new java.awt.Dimension(900, 540));
         setContentPane(chartPanel);
 
     }

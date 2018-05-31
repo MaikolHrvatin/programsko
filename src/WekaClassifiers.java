@@ -14,11 +14,17 @@ import java.io.File;
 import java.io.IOException;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NumericToNominal;
-import java.util.Random;
 import weka.classifiers.trees.J48;
 import weka.classifiers.Evaluation;
 import weka.classifiers.evaluation.ThresholdCurve;
 import weka.classifiers.functions.LinearRegression;
+import weka.classifiers.functions.Logistic;
+import weka.classifiers.lazy.KStar;
+import weka.classifiers.rules.OneR;
+import weka.classifiers.rules.PART;
+import weka.classifiers.rules.ZeroR;
+import weka.classifiers.trees.LMT;
+import weka.classifiers.trees.M5P;
 import weka.classifiers.trees.REPTree;
 import weka.classifiers.trees.RandomForest;
 import weka.classifiers.trees.RandomTree;
@@ -35,8 +41,21 @@ public class WekaClassifiers {
             new J48(),
             new NaiveBayes(),
             new RandomTree(),
-            new REPTree(), //ne radi !!!
-            new RandomForest()
+            new RandomForest(),
+            new PART(),
+            new Logistic()
+        };
+    }
+    
+    private static String[] clasName = new String[50];
+    static{
+        clasName = new String[]{
+            "J48",
+            "NaiveBayes",
+            "RandomTree",
+            "RandomForest",
+            "PART",
+            "Logistic"
         };
     }
     
@@ -149,22 +168,7 @@ public class WekaClassifiers {
         
         for(int i=0;i<indices.length;i++){
             
-            switch(indices[i]){
-                case 0:vratiText = vratiText.concat("J48\n");
-                break;
-                case 1:vratiText = vratiText.concat("Bayes\n");
-                break;
-                case 2:vratiText = vratiText.concat("RandomTree\n");
-                break;
-                case 3:vratiText = vratiText.concat("REPTree\n");
-                break;
-                case 4:vratiText = vratiText.concat("RandomForest\n");
-                break;
-                //LOGISTIČKA REGRESIJA
-                
-                default:vratiText = vratiText.concat("Greška\n");
-                break;
-            }
+            vratiText = vratiText.concat(clasName[indices[i]]+"\n");
             
             float correct = 0;
             float incorrect = 0;
@@ -172,7 +176,6 @@ public class WekaClassifiers {
             double gm = 0;
             
             for(int k=0; k<10; k++){
-                //promjeniti kod da pamti podatke !!!
                 eval = simpleClassify(clas[indices[i]], splitData[0][k], splitData[1][k]);
                 
                 correct += eval.pctCorrect();
@@ -183,7 +186,6 @@ public class WekaClassifiers {
                 double y = eval.trueNegativeRate(1);
                 gm += Math.sqrt(x*y);
                 
-                //System.out.println(gm); //MOŽE BACAT GREŠKU ?
             }
             
             vratiText = vratiText.concat("Correct % = "+ (correct/folds) +"\nIncorrect % = "+ (incorrect/folds) +"\n");
@@ -193,40 +195,42 @@ public class WekaClassifiers {
         return vratiText;
     }
     
-    public static void ROC_graph () throws Exception{
-        ThresholdCurve tc = new ThresholdCurve();
-        int classIndex = 0;
-        Instances result = tc.getCurve(eval.predictions(), classIndex);
-        
-        // plot curve
-        ThresholdVisualizePanel vmc = new ThresholdVisualizePanel();
-        vmc.setROCString("(Area under ROC = " + Utils.doubleToString(tc.getROCArea(result), 4) + ")");
-        vmc.setName(result.relationName());
-        PlotData2D tempd = new PlotData2D(result);
-        tempd.setPlotName(result.relationName());
-        tempd.addInstanceNumberAttribute();
-        // specify which points are connected
-        boolean[] cp = new boolean[result.numInstances()];
-        for (int n = 1; n < cp.length; n++){
-          cp[n] = true;
-        }
-        tempd.setConnectPoints(cp);
-        // add plot
-        vmc.addPlot(tempd);
+    public static void ROC_graph (Instances[][] splitData, int[] indices) throws Exception{
+        for(int i=0; i<indices.length; i++){
+            ThresholdCurve tc = new ThresholdCurve();
+            int classIndex = 0;
+            eval = simpleClassify(clas[indices[i]], splitData[0][0], splitData[1][0]);
+            Instances result = tc.getCurve(eval.predictions(), classIndex);
 
-        // prikaz grafa
-        String plotName = vmc.getName(); 
-        final javax.swing.JFrame jf = 
-        new javax.swing.JFrame("Weka Classifier Visualize: "+plotName);
-        jf.setSize(500,400);
-        jf.getContentPane().setLayout(new BorderLayout());
-        jf.getContentPane().add(vmc, BorderLayout.CENTER);
-        jf.addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent e) {
-            jf.dispose();
+            // plot curve
+            ThresholdVisualizePanel vmc = new ThresholdVisualizePanel();
+            vmc.setROCString("(Area under ROC = " + Utils.doubleToString(tc.getROCArea(result), 4) + ")");
+            vmc.setName(result.relationName());
+            PlotData2D tempd = new PlotData2D(result);
+            tempd.setPlotName(result.relationName());
+            tempd.addInstanceNumberAttribute();
+            // specify which points are connected
+            boolean[] cp = new boolean[result.numInstances()];
+            for (int n = 1; n < cp.length; n++){
+              cp[n] = true;
             }
-        });
-        jf.setVisible(true);
+            tempd.setConnectPoints(cp);
+            // add plot
+            vmc.addPlot(tempd);
+
+            // prikaz grafa
+            final javax.swing.JFrame jf = 
+            new javax.swing.JFrame("Weka Classifier Visualize: "+clasName[indices[i]]);
+            jf.setSize(500,400);
+            jf.getContentPane().setLayout(new BorderLayout());
+            jf.getContentPane().add(vmc, BorderLayout.CENTER);
+            jf.addWindowListener(new java.awt.event.WindowAdapter() {
+                public void windowClosing(java.awt.event.WindowEvent e) {
+                jf.dispose();
+                }
+            });
+            jf.setVisible(true);
+        }
     }
     
     public static double[][] box_plot(Instances[][] splitData, int[] indices) throws Exception{

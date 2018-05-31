@@ -1,7 +1,5 @@
 import javanpst.tests.multiple.friedmanTest.*;
-import javanpst.tests.multiple.pageTest.*;
 import javanpst.data.structures.dataTable.DataTable;
-import javanpst.tests.location.normalScoresTest.NormalScoresTest;
 import javanpst.tests.location.wilcoxonRankSumTest.WilcoxonRankSumTest;
 
 public class TestClassification{
@@ -19,6 +17,7 @@ public class TestClassification{
                 temp[j][i] = GM[i][j];
         //Data is formatted
         DataTable data = new DataTable(temp);
+        String output = "";
 
         if(GM.length == 2){
             WilcoxonRankSumTest test = new WilcoxonRankSumTest(data);
@@ -26,7 +25,13 @@ public class TestClassification{
             //Run Wilcoxon test
             test.doTest();
 
-            return "Wilcoxon ranked sum P_value: "+test.getAsymptoticDoublePValue();
+            output = output.concat("Wilcoxon ranked sum P_value: " +test.getAsymptoticDoublePValue());
+            if(test.getAsymptoticDoublePValue() < 0.05){
+                output = output.concat("\n\nPostoji znatna razlika među odabrana dva klasifikatora");
+            }else{
+                output = output.concat("\n\nNe postoji znatna razlika među odabranim klasifikatorima");
+            }
+            return output;
         }
         
         //Create tests
@@ -35,9 +40,13 @@ public class TestClassification{
         //Run Friedman test
         friedman.doTest();
 
-        //Print results of Friedman test
-        //System.out.println("Results of Friedman test:\n"+friedman.printReport());
-        return "Friedman P_value: "+friedman.getPValue();
+        output = output.concat("Wilcoxon ranked sum P_value: " +friedman.getPValue());
+        if(friedman.getPValue() < 0.05){
+            output = output.concat("\n\nPostoji znatna razlika među bar dva od odabranih klasifikatora");
+        }else{
+            output = output.concat("\n\nNe postoji znatna razlika među odabranim klasifikatorima");
+        }
+        return output;
     }//end-method
 
 }//end-class

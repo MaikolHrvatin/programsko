@@ -3,7 +3,6 @@ import weka.core.Instances;
 import weka.core.Attribute;
 import weka.core.converters.ConverterUtils;
 import weka.filters.Filter;
-import weka.filters.unsupervised.attribute.AddValues;
 import weka.filters.unsupervised.attribute.Remove;
 
 public class WekaData
