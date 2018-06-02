@@ -12,6 +12,7 @@ import weka.core.converters.ArffSaver;
 import weka.core.converters.CSVLoader;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 import weka.classifiers.trees.J48;
@@ -247,5 +248,30 @@ public class WekaClassifiers {
         } 
 
         return GM;
+    }
+    
+    public String GRN(String path, int[] indices) {
+        String output = "";
+        
+	for(int i=0; i<indices.length; i++){	
+            // Inicijalizacija objekta koji će se koristiti za komunikaciju s web servisom
+            Klasifikator_analizator sucelje = new Klasifikator_analizator(/* Ovdje će još ići neki argumenti poput puta do datoteke s podacima i slično */);
+            sucelje.obaviSve("DummyKlasifikator" /* Prosljeđuje se klasifikator koji se želi koristiti */);
+
+            Tocka kriticnaTocka = sucelje.vratiKriticnuTocku(); // Servis vraća objekt klase Tocka koji predstavlja kritičnu točku na grafu
+            //ArrayList<Tocka> tocke = sucelje.vratiTocke(); // Servis vraća listu objekata Tocka koja predstavlja sve točke u grafu
+
+            output = output.concat(clasName[indices[i]]+":\n");
+            output = output.concat("Kritična točka (x, y): (" + kriticnaTocka.X() + ", " + kriticnaTocka.Y() + ")\n\n");
+        }
+        //System.out.println("Kritična točka (x, y): (" + kriticnaTocka.X() + ", " + kriticnaTocka.Y() + ")"); // Ispis kritične točke
+        
+        // Ispis svih točaka
+        /*
+        for (int i = 0; i < tocke.size(); i++) {
+            System.out.println("Točka " + (i+1) + " (x, y): (" + tocke.get(i).X() + ", " + tocke.get(i).Y() + ")");
+        }
+        */
+        return output;
     }
 }

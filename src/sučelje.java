@@ -9,14 +9,15 @@ import org.jfree.ui.RefineryUtilities;
 public class sučelje extends javax.swing.JFrame {
 
    
-    public sučelje() {
+    private sučelje() {
         initComponents();
     }
-    public WekaData weka_data = new WekaData();
-    public WekaClassifiers weka_c = new WekaClassifiers();
-    public Instances data = null, new_data = null;
-    public Instances[][] split = null;
-    public int[] indices;
+    private WekaData weka_data = new WekaData();
+    private WekaClassifiers weka_c = new WekaClassifiers();
+    private Instances data = null, new_data = null;
+    private Instances[][] split = null;
+    private int[] indices;
+    private String path_data = "";
  
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -40,6 +41,7 @@ public class sučelje extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         B_boxplot = new javax.swing.JButton();
         b_usporedi = new javax.swing.JButton();
+        b_GRN = new javax.swing.JButton();
 
         jMenuItem1.setText("jMenuItem1");
 
@@ -106,6 +108,13 @@ public class sučelje extends javax.swing.JFrame {
             }
         });
 
+        b_GRN.setText("Granična razina neujednačenosti");
+        b_GRN.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                b_GRNActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -124,19 +133,22 @@ public class sučelje extends javax.swing.JFrame {
                         .addGroup(layout.createSequentialGroup()
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(startButton)
-                                .addComponent(jButtonPodatci)
-                                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGap(43, 43, 43)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jButtonPodatci)
+                                    .addGap(18, 18, 18)
                                     .addComponent(jButton1)
                                     .addGap(18, 18, 18)
-                                    .addComponent(B_boxplot)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(b_usporedi))
+                                    .addComponent(B_boxplot))
+                                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jLabel3)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 405, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(45, Short.MAX_VALUE))
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 405, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(b_usporedi)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(b_GRN))))))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -162,7 +174,8 @@ public class sučelje extends javax.swing.JFrame {
                     .addComponent(jButtonPodatci)
                     .addComponent(jButton1)
                     .addComponent(B_boxplot)
-                    .addComponent(b_usporedi))
+                    .addComponent(b_usporedi)
+                    .addComponent(b_GRN))
                 .addGap(37, 37, 37))
         );
 
@@ -219,6 +232,7 @@ public class sučelje extends javax.swing.JFrame {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             //DOBIVAMO CSV FILE
             File file = fileChooser.getSelectedFile();
+            path_data = file.getAbsolutePath();
             labelDatoteka.setText(file.getAbsolutePath());
             
             try {
@@ -294,6 +308,14 @@ public class sučelje extends javax.swing.JFrame {
         
     }//GEN-LAST:event_b_usporediActionPerformed
 
+    private void b_GRNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_GRNActionPerformed
+        // TODO add your handling code here:
+        indices = jListKlasifikatori.getSelectedIndices();
+        
+        String ispis = weka_c.GRN(path_data, indices);
+        jTextArea.setText(ispis);
+    }//GEN-LAST:event_b_GRNActionPerformed
+
     public static void main(String args[]) {
         
         try {
@@ -322,6 +344,7 @@ public class sučelje extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton B_boxplot;
+    private javax.swing.JButton b_GRN;
     private javax.swing.JButton b_usporedi;
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JButton jButton1;
