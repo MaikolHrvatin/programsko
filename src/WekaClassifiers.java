@@ -1,4 +1,6 @@
 
+import com.proginz.projekt.web_servis.Klasifikator_analizator;
+import com.proginz.projekt.web_servis.Tocka;
 import java.awt.BorderLayout;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -13,20 +15,15 @@ import weka.core.converters.CSVLoader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 import weka.classifiers.trees.J48;
 import weka.classifiers.Evaluation;
 import weka.classifiers.evaluation.ThresholdCurve;
-import weka.classifiers.functions.LinearRegression;
 import weka.classifiers.functions.Logistic;
-import weka.classifiers.lazy.KStar;
-import weka.classifiers.rules.OneR;
 import weka.classifiers.rules.PART;
-import weka.classifiers.rules.ZeroR;
-import weka.classifiers.trees.LMT;
-import weka.classifiers.trees.M5P;
-import weka.classifiers.trees.REPTree;
 import weka.classifiers.trees.RandomForest;
 import weka.classifiers.trees.RandomTree;
 import weka.core.Utils;
@@ -255,23 +252,23 @@ public class WekaClassifiers {
         
 	for(int i=0; i<indices.length; i++){	
             // Inicijalizacija objekta koji će se koristiti za komunikaciju s web servisom
-            Klasifikator_analizator sucelje = new Klasifikator_analizator(/* Ovdje će još ići neki argumenti poput puta do datoteke s podacima i slično */);
-            sucelje.obaviSve("DummyKlasifikator" /* Prosljeđuje se klasifikator koji se želi koristiti */);
+            Klasifikator_analizator sucelje = null;
+            try {
+                sucelje = new Klasifikator_analizator(0, "http://192.168.43.85:7779/ws/sucelje?wsdl");
+                sucelje.obaviSve(clasName[indices[i]]);
+            } catch (Exception ex) {
+                Logger.getLogger(WekaClassifiers.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
-            Tocka kriticnaTocka = sucelje.vratiKriticnuTocku(); // Servis vraća objekt klase Tocka koji predstavlja kritičnu točku na grafu
-            //ArrayList<Tocka> tocke = sucelje.vratiTocke(); // Servis vraća listu objekata Tocka koja predstavlja sve točke u grafu
-
+            //Tocka kriticnaTocka = sucelje.vratiKriticnuTocku(); // Servis vraća objekt klase Tocka koji predstavlja kritičnu točku na grafu
+            
+            ArrayList<Tocka> tocke = sucelje.vratiTocke();
+            
             output = output.concat(clasName[indices[i]]+":\n");
-            output = output.concat("Kritična točka (x, y): (" + kriticnaTocka.X() + ", " + kriticnaTocka.Y() + ")\n\n");
+            for (int j=0; j<tocke.size(); j++)
+                output = output.concat("(x, y): (" + tocke.get(j).getX() + ", " + tocke.get(j).gety() + ")\n\n");
+           // output = output.concat("Kritična točka (x, y): (" + kriticnaTocka.X() + ", " + kriticnaTocka.Y() + ")\n\n");
         }
-        //System.out.println("Kritična točka (x, y): (" + kriticnaTocka.X() + ", " + kriticnaTocka.Y() + ")"); // Ispis kritične točke
-        
-        // Ispis svih točaka
-        /*
-        for (int i = 0; i < tocke.size(); i++) {
-            System.out.println("Točka " + (i+1) + " (x, y): (" + tocke.get(i).X() + ", " + tocke.get(i).Y() + ")");
-        }
-        */
         return output;
     }
 }

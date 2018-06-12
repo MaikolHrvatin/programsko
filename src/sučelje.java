@@ -1,5 +1,6 @@
 import weka.core.Instances;
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
@@ -10,6 +11,13 @@ public class sučelje extends javax.swing.JFrame {
 
    
     private sučelje() {
+        /*
+        try {
+            Klasifikator_analizator kl = new Klasifikator_analizator(0, "http://192.168.43.5:7779/ws/sucelje?wsdl");
+        } catch (IOException ex) {
+            Logger.getLogger(sučelje.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        */
         initComponents();
     }
     private WekaData weka_data = new WekaData();
@@ -36,7 +44,7 @@ public class sučelje extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea = new javax.swing.JTextArea();
         jLabel3 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        b_ROC = new javax.swing.JButton();
         labelDatoteka = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         B_boxplot = new javax.swing.JButton();
@@ -85,10 +93,10 @@ public class sučelje extends javax.swing.JFrame {
 
         jLabel3.setText("Prikaz podataka");
 
-        jButton1.setText("ROC krivulja");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        b_ROC.setText("ROC krivulja");
+        b_ROC.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                b_ROCActionPerformed(evt);
             }
         });
 
@@ -123,31 +131,30 @@ public class sučelje extends javax.swing.JFrame {
                 .addGap(29, 29, 29)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel4)
-                                .addComponent(jLabel1))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(labelDatoteka, javax.swing.GroupLayout.PREFERRED_SIZE, 475, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(startButton)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jButtonPodatci)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(jButton1)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(B_boxplot))
-                                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGap(18, 18, 18)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel3)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 405, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(b_usporedi)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(b_GRN))))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel1))
+                        .addGap(18, 18, 18)
+                        .addComponent(labelDatoteka, javax.swing.GroupLayout.PREFERRED_SIZE, 475, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(startButton)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButtonPodatci)
+                                .addGap(18, 18, 18)
+                                .addComponent(b_ROC)
+                                .addGap(18, 18, 18)
+                                .addComponent(B_boxplot))
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 405, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(b_usporedi)
+                                .addGap(18, 18, 18)
+                                .addComponent(b_GRN)))))
                 .addContainerGap(17, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -156,11 +163,11 @@ public class sučelje extends javax.swing.JFrame {
                 .addGap(30, 30, 30)
                 .addComponent(startButton)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel4)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel4)
+                    .addComponent(labelDatoteka, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(labelDatoteka, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
+                .addComponent(jLabel1)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
@@ -172,7 +179,7 @@ public class sučelje extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonPodatci)
-                    .addComponent(jButton1)
+                    .addComponent(b_ROC)
                     .addComponent(B_boxplot)
                     .addComponent(b_usporedi)
                     .addComponent(b_GRN))
@@ -266,14 +273,14 @@ public class sučelje extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_startButtonActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void b_ROCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_ROCActionPerformed
         try {
             indices = jListKlasifikatori.getSelectedIndices();
             weka_c.ROC_graph(split, indices);
         } catch (Exception ex) {
             Logger.getLogger(sučelje.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_b_ROCActionPerformed
 
     private void B_boxplotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_boxplotActionPerformed
            
@@ -312,7 +319,7 @@ public class sučelje extends javax.swing.JFrame {
         // TODO add your handling code here:
         indices = jListKlasifikatori.getSelectedIndices();
         
-        String ispis = weka_c.GRN(path_data, indices);
+        String ispis = "";//weka_c.GRN(path_data, indices);
         jTextArea.setText(ispis);
     }//GEN-LAST:event_b_GRNActionPerformed
 
@@ -345,9 +352,9 @@ public class sučelje extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton B_boxplot;
     private javax.swing.JButton b_GRN;
+    private javax.swing.JButton b_ROC;
     private javax.swing.JButton b_usporedi;
     private javax.swing.JFileChooser fileChooser;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButtonPodatci;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

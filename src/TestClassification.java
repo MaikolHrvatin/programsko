@@ -40,7 +40,7 @@ public class TestClassification{
         //Run Friedman test
         friedman.doTest();
 
-        output = output.concat("Wilcoxon ranked sum P_value: " +friedman.getPValue());
+        output = output.concat("Friedman P_value: " +friedman.getPValue());
         if(friedman.getPValue() < 0.05){
             output = output.concat("\n\nPostoji znatna razlika među bar dva od odabranih klasifikatora");
         }else{
