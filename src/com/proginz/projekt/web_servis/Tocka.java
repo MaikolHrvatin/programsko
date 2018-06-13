@@ -9,11 +9,11 @@ public class Tocka {
 		this.y = y;
 	}
 	
-	public double getX () {
+	public double X () {
 		return this.x;
 	}
 	
-	public double gety() {
+	public double Y() {
 		return this.y;
 	}
 }

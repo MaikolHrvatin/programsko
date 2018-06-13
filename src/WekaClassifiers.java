@@ -15,6 +15,7 @@ import weka.core.converters.CSVLoader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import weka.filters.Filter;
@@ -247,28 +248,36 @@ public class WekaClassifiers {
         return GM;
     }
     
-    public String GRN(String path, int[] indices) {
+    public String GRN(String path, int[] indices) throws Exception{
+        
         String output = "";
+        Klasifikator_analizator sucelje = null;
         
 	for(int i=0; i<indices.length; i++){	
             // Inicijalizacija objekta koji će se koristiti za komunikaciju s web servisom
-            Klasifikator_analizator sucelje = null;
-            try {
-                sucelje = new Klasifikator_analizator(0, "http://192.168.43.85:7779/ws/sucelje?wsdl");
-                sucelje.obaviSve(clasName[indices[i]]);
-            } catch (Exception ex) {
-                Logger.getLogger(WekaClassifiers.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            //Tocka kriticnaTocka = sucelje.vratiKriticnuTocku(); // Servis vraća objekt klase Tocka koji predstavlja kritičnu točku na grafu
-            
-            ArrayList<Tocka> tocke = sucelje.vratiTocke();
+            sucelje = new Klasifikator_analizator(path, "http://25.71.49.67:7779/ws/sucelje?wsdl");
+            sucelje.obaviSve(clasName[indices[i]]);
+            Tocka tocka = sucelje.vratiTockuGranicneRazineNeujednacenosti();
             
             output = output.concat(clasName[indices[i]]+":\n");
-            for (int j=0; j<tocke.size(); j++)
-                output = output.concat("(x, y): (" + tocke.get(j).getX() + ", " + tocke.get(j).gety() + ")\n\n");
-           // output = output.concat("Kritična točka (x, y): (" + kriticnaTocka.X() + ", " + kriticnaTocka.Y() + ")\n\n");
+            output = output.concat("(x, y): (" + tocka.X() + ", " + tocka.Y() + ")\n\n");
         }
         return output;
+
+        /*
+        String output = "";
+        Klasifikator_analizator sucelje = new Klasifikator_analizator(1, "http://25.71.49.67:7779/ws/sucelje?wsdl");
+        sucelje.obaviSve("NaiveBayes");
+        ArrayList<Tocka> arr = sucelje.vratiTocke();
+        for (int i=0; i<arr.size(); i++) {
+            System.out.println("("+arr.get(i).X()+", "+arr.get(i).Y()+")");
+        }
+        double[] coeff = sucelje.vratiRegresiju();
+        System.out.println("coef="+Arrays.toString(coeff));
+        System.out.println(sucelje.granicnaRazinaNeujednacenosti(coeff));
+        Tocka t = sucelje.vratiTockuGranicneRazineNeujednacenosti();
+        System.out.println(t.X() + ", " + t.Y());
+        return output;
+        */
     }
 }

@@ -319,7 +319,12 @@ public class sučelje extends javax.swing.JFrame {
         // TODO add your handling code here:
         indices = jListKlasifikatori.getSelectedIndices();
         
-        String ispis = "";//weka_c.GRN(path_data, indices);
+        String ispis = "";
+        try {
+            ispis = weka_c.GRN(path_data, indices);
+        } catch (Exception ex) {
+            Logger.getLogger(sučelje.class.getName()).log(Level.SEVERE, null, ex);
+        }
         jTextArea.setText(ispis);
     }//GEN-LAST:event_b_GRNActionPerformed
 

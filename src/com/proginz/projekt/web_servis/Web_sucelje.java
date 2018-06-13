@@ -13,9 +13,8 @@ import javax.jws.soap.SOAPBinding.Style;
 public interface Web_sucelje {
 	@WebMethod void uveziPodatkeString(String podaci) throws NumberFormatException, IOException;
 	@WebMethod void uveziPodatkeInt(int brojTesta) throws NumberFormatException, IOException;
-	@WebMethod void postaviKlasifikator(String imeKlasifikatora);
-	@WebMethod void podijeliPaEvaluiraj() throws Exception;
+	@WebMethod void podijeliPaEvaluiraj(String imeModela) throws Exception;
 
 	@WebMethod String vratiProsjecniGM();
-	@WebMethod String vratiPragove();
+	@WebMethod String vratiPostotakManjinskeKlase();
 }
